@@ -1,0 +1,1439 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老板拍片军师 · 实体店短视频专家</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0e14;
+            --bg-card: #151b23;
+            --bg-input: #1c232e;
+            --fg: #e2e8f0;
+            --fg-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: rgba(59, 130, 246, 0.1);
+            --border: #2d3748;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--fg);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 14, 20, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 14, 20, 0.98);
+            box-shadow: var(--shadow);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--fg-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--accent);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--fg);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* 页面容器 */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* 首页 */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--fg), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--fg-muted);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .feature-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-card h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .feature-card p {
+            color: var(--fg-muted);
+        }
+
+        .scenarios {
+            padding: 4rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .scenarios h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2rem;
+        }
+
+        .scenario-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .scenario-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .scenario-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            min-width: 50px;
+        }
+
+        /* 聊天页面 */
+        .chat-container {
+            display: flex;
+            height: calc(100vh - 80px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .chat-sidebar {
+            width: 300px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .new-chat-btn {
+            padding: 0.5rem 1rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .new-chat-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .history-item:hover {
+            background: var(--bg-input);
+        }
+
+        .history-item.active {
+            background: var(--accent-light);
+            border-left: 3px solid var(--accent);
+        }
+
+        .history-item-wrapper {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .history-title {
+            font-size: 0.9rem;
+            color: var(--fg);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--fg-muted);
+            cursor: pointer;
+            padding: 0.4rem;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .history-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            color: #ef4444;
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-dark);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .message.assistant .message-avatar {
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+        }
+
+        .message.user .message-avatar {
+            background: var(--bg-input);
+            color: var(--fg-muted);
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .message.assistant .message-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+        }
+
+        .message.user .message-content {
+            background: var(--accent);
+            color: white;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bg-input);
+            border: none;
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            color: var(--fg-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .message-content:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn.copied {
+            background: #10b981;
+            color: white;
+        }
+
+        .chat-input-area {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.8rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--fg);
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            max-height: 120px;
+            line-height: 1.5;
+        }
+
+        .send-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: var(--accent-hover);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 打字指示器 */
+        .typing-indicator {
+            display: flex;
+            gap: 0.3rem;
+            align-items: center;
+            padding: 0.5rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* 欢迎屏幕 */
+        .welcome-screen {
+            text-align: center;
+            padding: 3rem 2rem;
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+
+        .welcome-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .welcome-screen h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--fg);
+        }
+
+        /* 弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            color: var(--fg-muted);
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--fg-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--fg);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .chat-container {
+                flex-direction: column;
+            }
+
+            .chat-sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .navbar {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-links span {
+                display: none;
+            }
+        }
+
+        /* Markdown样式 */
+        .message-content h1,
+        .message-content h2,
+        .message-content h3 {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--fg);
+        }
+
+        .message-content p {
+            margin-bottom: 0.8rem;
+        }
+
+        .message-content ul,
+        .message-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .message-content li {
+            margin-bottom: 0.3rem;
+        }
+
+        .message-content code {
+            background: var(--bg-input);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .message-content pre {
+            background: var(--bg-input);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .message-content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .message-content strong {
+            color: var(--accent);
+        }
+
+        .message-content blockquote {
+            border-left: 3px solid var(--accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--fg-muted);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">老板拍片军师</div>
+        <div class="nav-links">
+            <a id="nav-home" onclick="showPage('home')">首页</a>
+            <a id="nav-chat" onclick="handleAction()">聊天</a>
+            <span id="auth-status">
+                <button class="btn btn-secondary" onclick="openLoginModal()">登录/注册</button>
+            </span>
+        </div>
+    </nav>
+
+    <!-- 首页 -->
+    <div class="page active" id="home-page">
+        <section class="hero">
+            <canvas id="particles-canvas"></canvas>
+            <h1>老板拍片军师</h1>
+            <p>专为实体店老板打造的短视频编导助手</p>
+            <button class="btn btn-primary" onclick="handleAction()" style="font-size: 1.1rem; padding: 0.8rem 2rem;">
+                立即创作脚本
+            </button>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <h3>🎯 军师在线待命</h3>
+                <p>不用学复杂理论，告诉我你卖什么，我帮你写出接地气、能获客的脚本。</p>
+            </div>
+            <div class="feature-card">
+                <h3>💰 省钱、省心、接地气</h3>
+                <p>只做能获客的短视频，帮你把复杂的产品卖点转化成客户听得懂的大白话。</p>
+            </div>
+            <div class="feature-card">
+                <h3>📱 热门实战场景</h3>
+                <p>门窗、餐饮、装修等多个行业实战经验，直接复用成功案例。</p>
+            </div>
+        </section>
+
+        <section class="scenarios">
+            <h2>看看其他老板都在怎么用</h2>
+            <div class="scenario-item">
+                <div class="scenario-number">1</div>
+                <div>
+                    <h3>门窗店：隔音窗推广</h3>
+                    <p>针对临街住户痛点，演示噪音对比，直击客户需求。</p>
+                </div>
+            </div>
+            <div class="scenario-item">
+                <div class="scenario-number">2</div>
+                <div>
+                    <h3>餐饮店：引流获客</h3>
+                    <p>不搞虚头巴脑的剧情，直接展示食材新鲜和锅底特色。</p>
+                </div>
+            </div>
+            <div class="scenario-item">
+                <div class="scenario-number">3</div>
+                <div>
+                    <h3>装修行业：信任建立</h3>
+                    <p>通过工地细节展示专业度，消除客户对施工质量的顾虑。</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 聊天页面 -->
+    <div class="page" id="chat-page">
+        <div class="chat-container">
+            <div class="chat-sidebar">
+                <div class="sidebar-header">
+                    <h3>历史对话</h3>
+                    <button class="new-chat-btn" onclick="createNewSession()">+ 新建</button>
+                </div>
+                <div class="chat-history" id="chat-history">
+                    <!-- 历史记录动态加载 -->
+                </div>
+            </div>
+            <div class="chat-main">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- 消息动态加载 -->
+                </div>
+                <div class="chat-input-area">
+                    <div class="input-wrapper">
+                        <textarea
+                            id="chat-input"
+                            class="chat-input"
+                            placeholder="告诉我你的行业和卖点，我来帮你写脚本..."
+                            rows="1"
+                        ></textarea>
+                        <button id="send-btn" class="send-btn" disabled onclick="sendMessage()">
+                            发送
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录/注册弹窗 -->
+    <div class="modal" id="auth-modal">
+        <div class="modal-content">
+            <div class="tabs">
+                <div class="tab active" id="tab-login" onclick="switchTab('login')">登录</div>
+                <div class="tab" id="tab-reg" onclick="switchTab('register')">注册</div>
+            </div>
+
+            <!-- 登录表单 -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="login-username" placeholder="请输入用户名" required>
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="login-password" placeholder="请输入密码" required>
+                </div>
+                <div class="error-message" id="login-error"></div>
+                <button type="submit" id="login-btn" class="btn btn-primary" style="width: 100%;">
+                    <span>立即登录</span>
+                    <div class="loading"></div>
+                </button>
+            </form>
+
+            <!-- 注册表单 -->
+            <form id="register-form" style="display: none;">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="reg-username" placeholder="请设置用户名" required>
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="reg-password" placeholder="请设置密码" required>
+                </div>
+                <div class="error-message" id="reg-error"></div>
+                <button type="submit" id="reg-btn" class="btn btn-primary" style="width: 100%;">
+                    <span>立即注册</span>
+                    <div class="loading"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 配置区域 ====================
+        // 重要：部署到PythonAnywhere后，修改这里的BASE_URL为你的PythonAnywhere域名
+        // 例如：const BASE_URL = "https://fczjai.pythonanywhere.com";
+        const BASE_URL = "http://localhost:5000";
+
+        // ==================== 全局变量 ====================
+        let authToken = null;
+        let currentSessionId = null;
+        let isTyping = false;
+        const myAiAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/%3E%3C/svg%3E";
+
+        // ==================== 标记配置 ====================
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                breaks: true,
+                gfm: true
+            });
+        }
+
+        // ==================== 认证管理 ====================
+        function checkAuthStatus() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                authToken = token;
+                updateAuthUI(true);
+            } else {
+                updateAuthUI(false);
+            }
+        }
+
+        function updateAuthUI(isLoggedIn) {
+            const authStatus = document.getElementById('auth-status');
+            if (isLoggedIn) {
+                authStatus.innerHTML = '<button class="btn btn-secondary" onclick="logout()">退出登录</button>';
+            } else {
+                authStatus.innerHTML = '<button class="btn btn-secondary" onclick="openLoginModal()">登录/注册</button>';
+            }
+        }
+
+        async function login(username, password) {
+            try {
+                const response = await fetch(`${BASE_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    updateAuthUI(true);
+                    closeLoginModal();
+                    showPage('chat');
+                    loadHistoryList();
+                    return { success: true };
+                } else {
+                    return { success: false, message: data.message };
+                }
+            } catch (error) {
+                console.error('登录错误:', error);
+                return { success: false, message: '网络错误，请稍后重试' };
+            }
+        }
+
+        async function register(username, password) {
+            try {
+                const response = await fetch(`${BASE_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    updateAuthUI(true);
+                    closeLoginModal();
+                    showPage('chat');
+                    loadHistoryList();
+                    return { success: true };
+                } else {
+                    return { success: false, message: data.message };
+                }
+            } catch (error) {
+                console.error('注册错误:', error);
+                return { success: false, message: '网络错误，请稍后重试' };
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            localStorage.removeItem('authToken');
+            updateAuthUI(false);
+            showPage('home');
+        }
+
+        // ==================== API调用 ====================
+        async function apiCall(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}${endpoint}`, {
+                    ...options,
+                    headers
+                });
+                const data = await response.json();
+
+                if (response.status === 401) {
+                    logout();
+                    return null;
+                }
+
+                return data;
+            } catch (error) {
+                console.error('API调用错误:', error);
+                return null;
+            }
+        }
+
+        // ==================== 核心逻辑：动作拦截 ====================
+        function handleAction() {
+            if (authToken) {
+                showPage('chat');
+            } else {
+                openLoginModal();
+            }
+        }
+
+        // ==================== 弹窗控制 ====================
+        function openLoginModal() {
+            document.getElementById('auth-modal').style.display = 'flex';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('auth-modal').style.display = 'none';
+        }
+
+        function switchTab(type) {
+            document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+            if (type === 'login') {
+                document.getElementById('tab-login').classList.add('active');
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('register-form').style.display = 'none';
+            } else {
+                document.getElementById('tab-reg').classList.add('active');
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('register-form').style.display = 'block';
+            }
+        }
+
+        // ==================== 登录/注册表单处理 ====================
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const errDiv = document.getElementById('login-error');
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            btn.disabled = true;
+            btn.querySelector('span').style.display = 'none';
+            btn.querySelector('.loading').style.display = 'block';
+            errDiv.style.display = 'none';
+
+            const result = await login(username, password);
+
+            if (!result.success) {
+                errDiv.innerText = result.message;
+                errDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.querySelector('span').style.display = 'block';
+                btn.querySelector('.loading').style.display = 'none';
+            }
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('reg-btn');
+            const errDiv = document.getElementById('reg-error');
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+
+            btn.disabled = true;
+            btn.querySelector('span').style.display = 'none';
+            btn.querySelector('.loading').style.display = 'block';
+            errDiv.style.display = 'none';
+
+            const result = await register(username, password);
+
+            if (!result.success) {
+                errDiv.innerText = result.message;
+                errDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.querySelector('span').style.display = 'block';
+                btn.querySelector('.loading').style.display = 'none';
+            }
+        });
+
+        // ==================== 页面基础逻辑 ====================
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.getElementById(page + '-page').classList.add('active');
+            const navLink = document.getElementById('nav-' + page);
+            if (navLink) navLink.classList.add('active');
+            if (page === 'chat') document.getElementById('chat-input').focus();
+        }
+
+        // ==================== 粒子动画 ====================
+        function initParticles() {
+            const canvas = document.getElementById('particles-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            function createParticle() {
+                return {
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.max(1, Math.random() * 2),
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    alpha: Math.random() * 0.5 + 0.2
+                };
+            }
+
+            function init() {
+                resize();
+                particles = [];
+                const count = Math.min(35, Math.floor(canvas.width * canvas.height / 40000));
+                for (let i = 0; i < count; i++) particles.push(createParticle());
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, Math.max(0.5, p.radius), 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(0, 102, 204, ' + Math.max(0, Math.min(1, p.alpha)) + ')';
+                    ctx.fill();
+                });
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 180) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = 'rgba(0, 102, 204, ' + Math.max(0, Math.min(0.15, (1 - dist / 180) * 0.15)) + ')';
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                init();
+                animate();
+                window.addEventListener('resize', init);
+            }
+        }
+
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.feature-card, .scenario-item').forEach(el => observer.observe(el));
+        }
+
+        function initNavScroll() {
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
+            });
+        }
+
+        // ==================== 聊天功能 ====================
+        function initChat() {
+            const input = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            input.addEventListener('input', () => {
+                input.style.height = 'auto';
+                input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+                sendBtn.disabled = !input.value.trim();
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (input.value.trim()) sendMessage();
+                }
+            });
+        }
+
+        async function createNewSession() {
+            const data = await apiCall('/new_session', { method: 'POST' });
+            if (data && data.session_id) {
+                currentSessionId = data.session_id;
+                renderWelcomeScreen();
+                loadHistoryList();
+            }
+        }
+
+        function renderWelcomeScreen() {
+            document.getElementById('chat-messages').innerHTML = `
+                <div class="welcome-screen" id="welcome-screen">
+                    <div class="welcome-icon">🎬</div>
+                    <h1>今天拍点啥？</h1>
+                    <div style="background: var(--accent-light); padding: 20px; border-radius: 12px; text-align: left; max-width: 500px; margin: 0 auto 30px;">
+                        <p style="margin-bottom: 8px;"><strong>老板好！我是军师。</strong></p>
+                        <p style="margin-bottom: 8px;">咱们换个方式聊。你就把我当成<strong>刚走进你店里的顾客</strong>。</p>
+                        <p style="margin-bottom: 8px;">你直接跟我聊聊，你卖的是啥？跟别人比，你好在哪儿？不用管逻辑，就像平时推销那样跟我说就行。</p>
+                        <p style="color: var(--accent); font-size: 13px;">（我会像真顾客一样问你几个关键问题，问清楚了我立马给你出脚本！）</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadHistoryList() {
+            const data = await apiCall('/get_history');
+            if (data) {
+                const list = document.getElementById('chat-history');
+                list.innerHTML = '';
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item' + (item.id === currentSessionId ? ' active' : '');
+                    div.innerHTML = `
+                        <div class="history-item-wrapper">
+                            <svg style="flex-shrink:0; margin-right:10px;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <span class="history-title">${item.title}</span>
+                        </div>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteSession('${item.id}')" title="删除此对话">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    `;
+                    div.onclick = (e) => {
+                        if(e.target.closest('.delete-btn')) return;
+                        loadSession(item.id);
+                    };
+                    list.appendChild(div);
+                });
+            }
+        }
+
+        async function deleteSession(sid) {
+            if(confirm('确定要删除这条对话吗？')) {
+                const data = await apiCall(`/delete_session/${sid}`, { method: 'POST' });
+                if (data && data.success) {
+                    await loadHistoryList();
+                    if(sid === currentSessionId) {
+                        const historyData = await apiCall('/get_history');
+                        if(historyData && historyData.length > 0) {
+                            loadSession(historyData[0].id);
+                        } else {
+                            createNewSession();
+                        }
+                    }
+                }
+            }
+        }
+
+        async function loadSession(sid) {
+            currentSessionId = sid;
+            const data = await apiCall(`/get_session/${sid}`);
+            const box = document.getElementById('chat-messages');
+            box.innerHTML = '';
+            if (data && data.messages && data.messages.length > 0) {
+                data.messages.forEach(msg => {
+                    appendMessage(msg.role, msg.content, false);
+                });
+            } else {
+                renderWelcomeScreen();
+            }
+            await loadHistoryList();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || isTyping) return;
+
+            const welcomeScreen = document.getElementById('welcome-screen');
+            if (welcomeScreen) welcomeScreen.style.display = 'none';
+
+            appendMessage('user', text);
+            input.value = '';
+            input.style.height = 'auto';
+            document.getElementById('send-btn').disabled = true;
+
+            showTypingIndicator();
+
+            const data = await apiCall('/chat', {
+                method: 'POST',
+                body: JSON.stringify({ session_id: currentSessionId, message: text })
+            });
+
+            hideTypingIndicator();
+
+            if (data && data.reply) {
+                appendMessage('assistant', data.reply);
+                await loadHistoryList();
+            } else {
+                appendMessage('assistant', '发送失败，请稍后重试');
+            }
+        }
+
+        function appendMessage(role, content, scroll = true) {
+            const box = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'message ' + (role === 'user' ? 'user' : 'assistant');
+
+            let avatarHtml = '';
+            if (role === 'assistant') {
+                avatarHtml = `<div class="message-avatar">${myAiAvatar}</div>`;
+            } else {
+                avatarHtml = '<div class="message-avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+            }
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            if (role === 'assistant') {
+                try {
+                    contentDiv.innerHTML = (typeof marked !== 'undefined') ? marked.parse(content) : content.replace(/\n/g, '<br>');
+                } catch(e) {
+                    contentDiv.innerText = content;
+                }
+
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.innerText = '复制';
+                copyBtn.dataset.raw = content;
+                copyBtn.onclick = function() {
+                    const textToCopy = this.dataset.raw;
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            this.innerText = '已复制';
+                            this.classList.add('copied');
+                            setTimeout(() => {
+                                this.innerText = '复制';
+                                this.classList.remove('copied');
+                            }, 2000);
+                        }).catch(err => {
+                            fallbackCopy(textToCopy, this);
+                        });
+                    } else {
+                        fallbackCopy(textToCopy, this);
+                    }
+                };
+                contentDiv.appendChild(copyBtn);
+            } else {
+                contentDiv.innerText = content;
+            }
+
+            div.innerHTML = `<div class="message-avatar">${avatarHtml}</div>`;
+            div.appendChild(contentDiv);
+            box.appendChild(div);
+            if (scroll) box.scrollTop = box.scrollHeight;
+        }
+
+        function fallbackCopy(text, btn) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                btn.innerText = '已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerText = '复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                alert('复制失败');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showTypingIndicator() {
+            isTyping = true;
+            const box = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'message assistant';
+            div.id = 'typing-indicator';
+            div.innerHTML = `<div class="message-avatar">${myAiAvatar}</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            isTyping = false;
+            const div = document.getElementById('typing-indicator');
+            if (div) div.remove();
+        }
+
+        // ==================== 初始化 ====================
+        window.onload = function() {
+            initParticles();
+            initScrollAnimations();
+            initNavScroll();
+            initChat();
+            checkAuthStatus();
+
+            if (authToken) {
+                loadHistoryList().then(() => {
+                    createNewSession();
+                });
+            }
+        };
+    </script>
+</body>
+</html>
